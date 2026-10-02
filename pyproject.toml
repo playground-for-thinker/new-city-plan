@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "markdown>=3.6", "playwright>=1.48"]   # markdown·playwright: 도움말 PDF 만들기(tools/build_docs.py)
 
 [build-system]
 requires = ["hatchling"]

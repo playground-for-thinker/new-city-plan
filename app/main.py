@@ -11,15 +11,18 @@ import ui  # noqa: E402
 
 st.set_page_config(page_title="신도시 타당성 분석", page_icon=":material/location_city:", layout="wide")
 
-nav = st.navigation([
-    st.Page("views/0_project.py", title="프로젝트", icon=":material/folder_open:", default=True),
-    st.Page("views/1_site.py", title="① 대상지 선정", icon=":material/map:"),
-    st.Page("views/2_context.py", title="② 상위계획·입지현황", icon=":material/travel_explore:"),
-    st.Page("views/3_cost.py", title="③ 사업비 산정", icon=":material/payments:"),
-    st.Page("views/4_landuse.py", title="④ 토지이용계획", icon=":material/grid_view:"),
-    st.Page("views/5_concept.py", title="⑤ 기본구상", icon=":material/architecture:"),
-    st.Page("views/6_finance.py", title="⑥ 재무적 타당성", icon=":material/monitoring:"),
-])
+nav = st.navigation({
+    "": [st.Page("views/0_project.py", title="프로젝트", icon=":material/folder_open:", default=True)],
+    "분석 단계": [
+        st.Page("views/1_site.py", title="① 대상지 선정", icon=":material/map:"),
+        st.Page("views/2_context.py", title="② 상위계획·입지현황", icon=":material/travel_explore:"),
+        st.Page("views/3_cost.py", title="③ 사업비 산정", icon=":material/payments:"),
+        st.Page("views/4_landuse.py", title="④ 토지이용계획", icon=":material/grid_view:"),
+        st.Page("views/5_concept.py", title="⑤ 기본구상", icon=":material/architecture:"),
+        st.Page("views/6_finance.py", title="⑥ 재무적 타당성", icon=":material/monitoring:"),
+    ],
+    "안내": [st.Page("views/7_help.py", title="도움말", icon=":material/menu_book:")],
+})
 
 with st.sidebar:
     prj = ui.project()

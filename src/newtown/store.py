@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import shutil
 
 import geopandas as gpd
 
@@ -13,6 +14,26 @@ from .site.parcels import empty_parcels, parcels_from_geojson, parcels_to_geojso
 def _dir(name: str):
     safe = re.sub(r"[^\w가-힣 .-]", "_", name).strip() or "project"
     return standards.PROJECTS_DIR / safe
+
+
+def seed_examples() -> list[str]:
+    """저장소의 예제 프로젝트를 프로젝트 폴더에 복사한다(같은 이름이 없을 때만). 복사한 이름을 돌려준다.
+
+    Streamlit Community Cloud처럼 프로젝트 폴더가 비어서 시작하는 환경에서도 불러올 예제가 있게 한다.
+    """
+    if not standards.EXAMPLES_DIR.exists():
+        return []
+    copied = []
+    for src in sorted(standards.EXAMPLES_DIR.iterdir()):
+        dst = standards.PROJECTS_DIR / src.name
+        if (src / "project.json").exists() and not dst.exists():
+            shutil.copytree(src, dst)
+            copied.append(src.name)
+    return copied
+
+
+def is_example(name: str) -> bool:
+    return (standards.EXAMPLES_DIR / name / "project.json").exists()
 
 
 def list_projects() -> list[str]:

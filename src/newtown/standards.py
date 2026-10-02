@@ -13,6 +13,7 @@ DATA_DIR = ROOT / "data"
 STANDARDS_DIR = DATA_DIR / "standards"
 REFERENCES_DIR = DATA_DIR / "references"
 PROJECTS_DIR = ROOT / "projects"
+EXAMPLES_DIR = ROOT / "examples"    # 저장소에 함께 들어 있는 예제 프로젝트
 CACHE_DIR = ROOT / ".cache"
 
 

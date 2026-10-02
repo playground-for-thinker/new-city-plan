@@ -24,12 +24,16 @@ with left, st.container(border=True):
                 st.rerun()
 with right, st.container(border=True):
     st.subheader("프로젝트 불러오기")
+    store.seed_examples()
     names = store.list_projects()
     if names:
         sel = st.selectbox("저장된 프로젝트", names, label_visibility="collapsed")
         if st.button("불러오기"):
             ui.set_project(*store.load(sel))
             st.rerun()
+        if store.is_example(sel):
+            st.caption("예제 프로젝트입니다. VWorld에서 받은 실제 필지 748건이 들어 있어 인증키 없이도 전 단계를 살펴볼 수 있습니다. "
+                       "단가·공급가격은 초기값 그대로이므로 결과는 사용법을 익히는 용도로만 보세요.")
     else:
         st.caption("저장된 프로젝트가 없습니다.")
 

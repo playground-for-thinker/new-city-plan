@@ -329,3 +329,22 @@ def test_upgrade_keeps_user_values_and_splits_park_row():
     assert "c_basic" in by_key and prj.cost_template_version == "2"
     keys = {r.key: r.ratio for r in prj.landuse}
     assert keys["p_park"] + keys["p_green"] == pytest.approx(25.0) and keys["p_green"] > 0
+
+
+# ---------- 도움말 문서 ----------
+def test_docs_render_and_pdfs_are_current():
+    import json
+    import re
+    from newtown import docs
+
+    built = json.loads((docs.DOCS_DIR / "build_info.json").read_text(encoding="utf-8"))
+    for name in docs.DOCUMENTS:
+        text = docs.render(name)
+        assert not re.findall(r"\{\{\w+\}\}", text)                      # 자리 채우기가 모두 끝났다
+        for img in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", text):
+            assert (docs.DOCS_DIR / img).exists(), img
+        assert docs.pdf_path(name).read_bytes()[:5] == b"%PDF-"
+        # 본문이나 기준정보를 바꾸고 PDF를 다시 만들지 않으면 실패한다 → uv run python tools/build_docs.py
+        assert built[name] == docs.content_hash(name), f"{name}.pdf 가 현재 본문과 다릅니다. tools/build_docs.py 를 다시 실행하세요."
+    # 문서의 표는 기준정보에서 온다
+    assert "| 경기 | 1.85 | 1.49 | 1.92 |" in docs.render("supplement")

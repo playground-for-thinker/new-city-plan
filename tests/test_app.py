@@ -12,7 +12,7 @@ from newtown.site import parcels as P
 
 MAIN = str(Path(__file__).resolve().parents[1] / "app" / "main.py")
 PAGES = ["views/0_project.py", "views/1_site.py", "views/2_context.py", "views/3_cost.py",
-         "views/4_landuse.py", "views/5_concept.py", "views/6_finance.py"]
+         "views/4_landuse.py", "views/5_concept.py", "views/6_finance.py", "views/7_help.py"]
 
 
 @pytest.fixture
@@ -80,6 +80,7 @@ def test_parcel_file_rewritten_only_when_parcels_change(sample, tmp_path):
     pfile = tmp_path / "화면시험" / "parcels.geojson"
     os.utime(pfile, (1_000_000_000, 1_000_000_000))
     at = AppTest.from_file(MAIN, default_timeout=60).run()
+    at.selectbox[0].set_value("화면시험")
     at.button[1].click().run()                      # 프로젝트 불러오기
     assert at.session_state["project"].name == "화면시험"
     for page in PAGES[1:]:
@@ -87,3 +88,27 @@ def test_parcel_file_rewritten_only_when_parcels_change(sample, tmp_path):
         assert not at.exception, (page, at.exception)
     assert pfile.stat().st_mtime == 1_000_000_000
     assert (tmp_path / "화면시험" / "project.json").stat().st_mtime > 1_000_000_000
+
+
+def test_help_page_shows_both_documents(tmp_path, monkeypatch):
+    monkeypatch.setattr(standards, "PROJECTS_DIR", tmp_path)
+    at = run("views/7_help.py")
+    assert not at.exception
+    assert [t.label for t in at.tabs] == ["사용 설명서", "산정 방법과 근거"]
+    body = " ".join(m.value for m in at.markdown)
+    assert "① 대상지 선정" in body and "보상배율표" in body and "{{" not in body
+
+
+def test_example_project_is_seeded_and_loads(tmp_path, monkeypatch):
+    """빈 프로젝트 폴더로 시작해도(클라우드) 예제 프로젝트가 목록에 있고, 불러오면 전 단계가 계산된다."""
+    monkeypatch.setattr(standards, "PROJECTS_DIR", tmp_path)
+    at = AppTest.from_file(MAIN, default_timeout=90).run()
+    example = "예제_남양주 오남-진접 일대"
+    assert example in at.selectbox[0].options
+    at.selectbox[0].set_value(example)
+    at.button[1].click().run()
+    assert not at.exception
+    assert len(at.session_state["parcels"]) == 769 and at.session_state["project"].boundary
+    at.switch_page("views/6_finance.py").run()
+    labels = {m.label: m.value for m in at.metric}
+    assert not at.exception and float(labels["PI (수익성지수)"]) > 0
