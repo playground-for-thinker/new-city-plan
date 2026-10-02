@@ -1,0 +1,63 @@
+# 사업비 항목 틀 (LH 조성원가 항목 체계)
+#
+# 조성비·기반시설설치비는 두 가지 방식 가운데 하나로 산정한다 (group).
+#   rough  : LH가 누리집에 공개한 지구별 조성원가 산정표의 실적 단가(총사업면적 ㎡당). 초기 단가는
+#            data/references/lh_cost_disclosures.csv 의 최근 공공주택지구 중앙값으로 자동 설정된다.
+#   detail : LH 「단지개발사업 조성비 및 기반시설설치비 추정자료」 단가(lh_unit_costs_*.yaml)와 요율표(fee_rates.yaml)로 적산.
+#
+# method:
+#   auto      : 프로그램이 계산 (보상비)
+#   qty_price : 물량 × 단가. basis 로 물량을 자동 연결
+#               (total_area, dev_area(총면적−보존면적), road_area, park_area, green_area, paid_area, population, manual)
+#   rate      : 기준금액(base) × 요율
+#   manual    : 금액 직접 입력
+#   capital   : 자본비용 = 연차별 순투입액 누적액 합계 × 자본비용률 (LH 조성원가 산식)
+# auto + table: 단가·요율을 기준표에서 자동으로 가져온다 (auto 를 끄면 직접 입력 값을 쓴다)
+#   lh_basic_housing : LH 주택단지 기본시설공사 단가 (지형·규모별)
+#   design_civil / supervision_civil_* / facility_misc : fee_rates.yaml 의 요율표
+# base (rate 항목의 기준금액):
+#   construction    : 조성공사비 (조성비 가운데 요율 항목을 뺀 금액)
+#   land_direct     : 토지보상비 + 지장물 및 기타 보상비
+#   land            : 용지비 합계
+#   direct_ex_labor : 용지비 + 용지부담금 + 조성비 + 기반시설설치비 + 이주대책비  (직접인건비 산식의 기준)
+#   direct          : direct_ex_labor + 직접인건비  (판매비·일반관리비·그 밖의 비용 산식의 기준)
+# schedule (연차별 투입 기준): comp(보상 일정) / const(공사 일정) / sales(분양 일정) / spread(보상+공사 투입액에 비례)
+# vat: 부가가치세 가산 대상, bid: 낙찰률 적용 대상
+version: "2"
+lines:
+  - {key: land_comp,     category: 용지비,       name: 토지보상비,            method: auto, schedule: comp}
+  - {key: obstacle,      category: 용지비,       name: 지장물 및 기타 보상비,  method: auto, schedule: comp}
+  - {key: indirect_comp, category: 용지비,       name: 간접보상비(측량·감정평가·등기 등), method: rate, base: land_direct, rate: 0, schedule: comp}
+  - {key: levy_farm,     category: 용지부담금,   name: 농지보전부담금,         method: manual, amount: 0, schedule: comp}
+  - {key: levy_forest,   category: 용지부담금,   name: 대체산림자원조성비,     method: manual, amount: 0, schedule: comp}
+  - {key: levy_gb,       category: 용지부담금,   name: 개발제한구역 보전부담금, method: manual, amount: 0, schedule: comp}
+  - {key: levy_etc,      category: 용지부담금,   name: 기타 부담금,            method: manual, amount: 0, schedule: comp}
+
+  # ---- rough: LH 공개 조성원가 실적 단가 (설계·감리·자재·부담금·부가세가 들어 있는 금액) ----
+  - {key: c_rough,       category: 조성비,       name: "조성비 (LH 공개 산정표 실적 단가)", method: qty_price, basis: total_area, unit: ㎡, unit_price: 0, benchmark: construction_per_m2, schedule: const, group: rough}
+  - {key: infra_rough,   category: 기반시설설치비, name: "기반시설설치비 (LH 공개 산정표 실적 단가)", method: qty_price, basis: total_area, unit: ㎡, unit_price: 0, benchmark: infra_per_m2, schedule: const, group: rough}
+
+  # ---- detail: LH 추정자료 단가 적산 ----
+  - {key: c_basic,       category: 조성비,       name: "기본시설공사 (LH 주택단지 단가)", method: qty_price, basis: dev_area, unit: ㎡, auto: true, table: lh_basic_housing, vat: true, bid: true, schedule: const, group: detail}
+  - {key: c_park,        category: 조성비,       name: "공원 조성 (근린공원 단가)",   method: qty_price, basis: park_area,  unit: ㎡, unit_price: 127000, vat: true, bid: true, schedule: const, group: detail}
+  - {key: c_green,       category: 조성비,       name: "녹지 조성 (완충녹지 단가)",   method: qty_price, basis: green_area, unit: ㎡, unit_price: 53000,  vat: true, bid: true, schedule: const, group: detail}
+  - {key: x_road,        category: 조성비,       name: "추가: 진입도로 (4차로 신설)", method: qty_price, basis: manual, qty: 0, unit: m, unit_price: 5923000,  vat: true, bid: true, schedule: const, group: detail}
+  - {key: x_bridge,      category: 조성비,       name: "추가: 교량 (PSC교, 상판면적)", method: qty_price, basis: manual, qty: 0, unit: ㎡, unit_price: 3822000, vat: true, bid: true, schedule: const, group: detail}
+  - {key: x_underpass,   category: 조성비,       name: "추가: 지하차도 (4차로 BOX)",  method: qty_price, basis: manual, qty: 0, unit: m, unit_price: 31275000, vat: true, bid: true, schedule: const, group: detail}
+  - {key: x_noise,       category: 조성비,       name: "추가: 방음벽 (투명 H=9m)",    method: qty_price, basis: manual, qty: 0, unit: m, unit_price: 6112000,  vat: true, bid: true, schedule: const, group: detail}
+  - {key: x_soft,        category: 조성비,       name: "추가: 연약지반 처리 (PBD)",   method: qty_price, basis: manual, qty: 0, unit: ㎡, unit_price: 12066,   vat: true, bid: true, schedule: const, group: detail}
+  - {key: x_etc,         category: 조성비,       name: "추가: 그 밖의 공종 (하천·저류지·전기·통신·특수구조물 등)", method: manual, amount: 0, vat: true, schedule: const, group: detail}
+  - {key: survey,        category: 조성비,       name: 조사·측량비,           method: rate, base: construction, rate: 0.01, vat: true, schedule: const, group: detail}
+  - {key: design,        category: 조성비,       name: 설계비(기본+실시),     method: rate, base: construction, auto: true, table: design_civil, vat: true, schedule: const, group: detail}
+  - {key: supervision,   category: 조성비,       name: 감리비(전면책임감리),  method: rate, base: construction, auto: true, table: supervision_civil_normal, vat: true, schedule: const, group: detail}
+  - {key: const_misc,    category: 조성비,       name: 시설부대비,            method: rate, base: construction, auto: true, table: facility_misc, vat: true, schedule: const, group: detail}
+  - {key: infra_traffic, category: 기반시설설치비, name: 광역교통개선대책 분담금, method: manual, amount: 0, schedule: const, group: detail}
+  - {key: infra_offsite, category: 기반시설설치비, name: 구역 외 기반시설·각종 원인자부담금, method: manual, amount: 0, vat: true, schedule: const, group: detail}
+
+  - {key: relocation,    category: 이주대책비,   name: 이주대책비,            method: manual, amount: 0, schedule: comp}
+  # 제비용률 초기값은 lh_cost_disclosures.csv 의 가장 최근 연도 산정표에서 가장 많이 쓰인 값으로 자동 설정된다 (benchmark)
+  - {key: labor,         category: 직접인건비,   name: 직접인건비,            method: rate, base: direct_ex_labor, rate: 0, benchmark: labor_rate_pct, schedule: spread}
+  - {key: sales_exp,     category: 판매비,       name: 판매비,                method: rate, base: direct, rate: 0, benchmark: sales_rate_pct, schedule: sales}
+  - {key: admin_exp,     category: 일반관리비,   name: 일반관리비,            method: rate, base: direct, rate: 0, benchmark: admin_rate_pct, schedule: spread}
+  - {key: capital,       category: 자본비용,     name: 자본비용,              method: capital, rate: 0, benchmark: capital_rate_pct, schedule: spread}
+  - {key: etc_exp,       category: 그 밖의 비용, name: 그 밖의 비용,          method: rate, base: direct, rate: 0, benchmark: etc_rate_pct, schedule: spread}

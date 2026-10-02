@@ -1,0 +1,65 @@
+# LH 「2024년도 단지개발사업 조성비 및 기반시설설치비 추정자료」의 단위공사비
+#
+# 원문은 공개 경로로 구하지 못했다(자료를 올린 사이트가 회원만 내려받을 수 있음).
+# 아래 값은 이 자료를 인용한 인천연구원 「2025년 인천광역시 지방재정 투자사업 비용산정 가이드라인」(2024)의 표에서 옮긴 것으로,
+# 인천연구원이 2024년 12월 말 기준으로 물가 보정한 금액이다. LH 원문 수치와 다를 수 있다.
+version: "2024"
+price_base: "2024-12"
+source: >-
+  한국토지주택공사(2024) 「2024년도 단지개발사업 조성비 및 기반시설설치비 추정자료」 —
+  인천연구원(2024) 「2025년 인천광역시 지방재정 투자사업 비용산정 가이드라인」 표 4-9, 4-13, 4-15, 4-19, 4-20, 4-23, 4-28, 4-31, 4-37 재인용
+source_url: https://www.ii.re.kr/storage/report/BB0000042011.pdf
+notes:
+  - 부가가치세 제외, 제경비 포함 금액
+  - 기본시설공사 단가는 사업면적(총면적 − 보존면적) 기준이며 기본공종만 포함한다(하천·저류지, 특수구조물 등 추가공종 제외)
+  - 기본시설공사 단가는 설계용역 대가 산출을 위한 추정공사비 산정용으로 제시된 값이다
+  - 토질 여건(암 발생, 연약지반), 가설·진입도로 필요 여부에 따라 별도 가산이 필요하다
+
+# 주택단지 기본시설공사 단가 (원/㎡). max_area: 그 면적(㎡) 이하에 적용, null 은 초과 구간
+basic_housing:
+  평지:
+    - {max_area: 200000, price: 53785}
+    - {max_area: 500000, price: 52465}
+    - {max_area: 1000000, price: 49256}
+    - {max_area: 1500000, price: 49330}
+    - {max_area: 2000000, price: 44641}
+    - {max_area: null, price: 43855}
+  구릉지:
+    - {max_area: 1000000, price: 62161}
+    - {max_area: 1500000, price: 56878}
+    - {max_area: null, price: 54566}
+
+# 추가공종·기반시설 참고 단가 (원). 화면의 참고표와 추가공종 초기 단가로 쓴다.
+reference:
+  - {group: 진입도로, item: 1차로 확장(편도), unit: m, price: 2194000}
+  - {group: 진입도로, item: 2차로 신설(왕복), unit: m, price: 4659000}
+  - {group: 진입도로, item: 4차로 신설(왕복), unit: m, price: 5923000}
+  - {group: 진입도로, item: 6차로 신설(왕복), unit: m, price: 6374000}
+  - {group: 교량, item: PSC교, unit: ㎡, price: 3822000}
+  - {group: 교량, item: 강교(ST. Box), unit: ㎡, price: 3788000}
+  - {group: 교량, item: 콘크리트교(RC 라멘), unit: ㎡, price: 2813000}
+  - {group: 보도육교, item: 강교, unit: ㎡, price: 5935000}
+  - {group: 보도육교, item: PSC교, unit: ㎡, price: 3046000}
+  - {group: 터널(한 방향), item: 2차로(NATM), unit: m, price: 15426000}
+  - {group: 터널(한 방향), item: 3차로(NATM), unit: m, price: 17910000}
+  - {group: 지하차도, item: 4차로 U-Type, unit: m, price: 11458000}
+  - {group: 지하차도, item: 4차로 BOX-Type, unit: m, price: 31275000}
+  - {group: 지하차도, item: 6차로 U-Type, unit: m, price: 23526000}
+  - {group: 지하차도, item: 6차로 BOX-Type, unit: m, price: 83926000}
+  - {group: 방음벽(투명), item: H=3m, unit: m, price: 2209000}
+  - {group: 방음벽(투명), item: H=5m, unit: m, price: 3298000}
+  - {group: 방음벽(투명), item: H=9m, unit: m, price: 6112000}
+  - {group: 방음벽(투명), item: H=13m, unit: m, price: 8583000}
+  - {group: 방음벽(흡음), item: H=5m, unit: m, price: 2666000}
+  - {group: 방음벽(흡음), item: H=9m, unit: m, price: 4711000}
+  - {group: 방음터널, item: 4차로, unit: m, price: 16169000}
+  - {group: 방음터널, item: 6차로, unit: m, price: 22515000}
+  - {group: 연약지반 처리, item: Pre-loading 공법, unit: ㎡, price: 10187}
+  - {group: 연약지반 처리, item: PBD 공법, unit: ㎡, price: 12066}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 근린공원·소공원, unit: ㎡, price: 127000}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 어린이공원, unit: ㎡, price: 200000}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 주제공원, unit: ㎡, price: 122000}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 완충녹지, unit: ㎡, price: 53000}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 경관녹지, unit: ㎡, price: 31000}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 연결녹지, unit: ㎡, price: 80000}
+  - {group: 공원·녹지(LH 2016 조경 대가기준), item: 공공공지, unit: ㎡, price: 87000}

@@ -1,0 +1,28 @@
+# 토지이용계획 표준 용도 분류와 기본 설정
+# share_in_major: 사례(대분류 비율)를 불러올 때 대분류 비율을 세분류로 나누는 기본 배분율(%). 프로그램 기본 가정이며 화면에서 수정한다.
+# paid: 유상공급 여부. price_basis: cost(조성원가 × 배율) / manual(㎡당 단가 직접 입력)
+# 공급가격 기준(cost_mult, unit_price)은 택지 공급가격 관련 지침을 확인해 화면에서 입력한다. 기본값 1.0은 "조성원가 그대로"라는 뜻의 자리표시 값이다.
+# far(용적률 %), unit_gfa(세대당 연면적 ㎡), lot_size(단독주택 필지 ㎡)는 기본구상용 가정값이며 화면에서 수정한다.
+majors:
+  - {key: housing,         name: 주택건설용지,       ref_col: housing_pct}
+  - {key: commercial,      name: 상업·업무시설용지,  ref_col: commercial_pct}
+  - {key: self_sufficient, name: 자족시설용지,       ref_col: self_sufficient_pct}
+  - {key: park_green,      name: 공원·녹지,          ref_col: park_green_pct}
+  - {key: road,            name: 도로,               ref_col: road_pct}
+  - {key: school,          name: 학교,               ref_col: school_pct}
+  - {key: other_public,    name: 기타 공공시설,      ref_col: other_public_pct}
+rows:
+  - {key: h_detached, major: housing, name: 단독주택,        share_in_major: 12, paid: true, price_basis: cost, cost_mult: 1.0, housing_type: detached, lot_size: 250, units_per_lot: 1.5}
+  - {key: h_apt_sale, major: housing, name: 공동주택(분양),  share_in_major: 55, paid: true, price_basis: cost, cost_mult: 1.0, housing_type: apartment, far: 180, unit_gfa: 110}
+  - {key: h_apt_rent, major: housing, name: 공동주택(임대),  share_in_major: 28, paid: true, price_basis: cost, cost_mult: 1.0, housing_type: apartment, far: 180, unit_gfa: 80}
+  - {key: h_neigh,    major: housing, name: 근린생활시설,    share_in_major: 5,  paid: true, price_basis: cost, cost_mult: 1.0}
+  - {key: c_comm,     major: commercial, name: 상업시설,     share_in_major: 60, paid: true, price_basis: cost, cost_mult: 1.0}
+  - {key: c_office,   major: commercial, name: 업무시설,     share_in_major: 40, paid: true, price_basis: cost, cost_mult: 1.0}
+  - {key: s_support,  major: self_sufficient, name: 자족(도시지원)시설, share_in_major: 100, paid: true, price_basis: cost, cost_mult: 1.0}
+  - {key: p_park,     major: park_green, name: 공원,         share_in_major: 60, paid: false}
+  - {key: p_green,    major: park_green, name: 녹지,         share_in_major: 40, paid: false}
+  - {key: r_road,     major: road, name: 도로,               share_in_major: 100, paid: false}
+  - {key: e_school,   major: school, name: 학교,             share_in_major: 100, paid: true, price_basis: cost, cost_mult: 1.0}
+  - {key: o_public,   major: other_public, name: 기타 공공시설(하천·청사·주차장 등), share_in_major: 100, paid: false}
+# 사례 파일(data/references/newtown_landuse.csv)이 없을 때만 쓰는 임시 기본 비율(%)
+fallback_major_pct: {housing: 35, commercial: 4, self_sufficient: 8, park_green: 28, road: 15, school: 4, other_public: 6}
